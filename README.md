@@ -56,11 +56,11 @@ docker compose up --build
 curl -X POST "http://127.0.0.1:8787/api/v1/rerank" \
   -H "Content-Type: application/json" \
   -d '{
-    "query": "what is panda?",
+    "query": "what is the problem?",
     "documents": [
       {"id": 1, "text": "meow."},
       {"id": 2, "text": "The food bowl is empty."},
-      {"id": 3, "text": "I like cats."}
+      {"id": 3, "text": "I am starving."}
     ]
   }'
 ```
