@@ -1,0 +1,17 @@
+services:
+  reranker:
+    build:
+      context: .
+    environment:
+      - HOST=0.0.0.0
+      - PORT=8787
+      - MAX_LENGTH=512
+      - MODEL=BAAI/bge-reranker-v2-m3
+      # optionally: - DEVICE=cuda   # or mps / cpu
+    ports:
+      - "8787:8787"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8787/healthz"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
