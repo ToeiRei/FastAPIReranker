@@ -79,6 +79,11 @@ async def rerank_documents(request: RequestData):
 
     return {"data": response}
 
+# Basic healthcheck
+@app.get("/healthz")
+async def healthz():
+    return {"status": "ok"}
+
 # Entrypoint
 if __name__ == "__main__":
     import uvicorn
