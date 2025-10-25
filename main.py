@@ -59,7 +59,19 @@ class ResponseData(BaseModel):
 async def rerank_documents(request: RequestData):
     logging.info("Reranking %d documents for query: %.50s...", len(request.documents), request.query)
 
-    pairs = request.construct_pairs()
+    # Guard: no documents → return empty list
+    if not request.documents:
+        logging.info("No documents supplied, returning empty result.")
+        return {"data": []}
+
+    # Optional: filter out empty/whitespace-only texts
+    docs = [doc for doc in request.documents if (doc.text or "").strip()]
+    if not docs:
+        logging.info("All documents empty after filtering, returning empty result.")
+        return {"data": []}
+
+    pairs = [[request.query, doc.text] for doc in docs]
+
     with torch.no_grad():
         inputs = tokenizer(
             pairs,
@@ -70,10 +82,9 @@ async def rerank_documents(request: RequestData):
         ).to(device)
         scores = model(**inputs, return_dict=True).logits.view(-1).float()
 
-    # Build response objects
     response = [
         ResponseData(id=doc.id, similarity=score.item())
-        for doc, score in zip(request.documents, scores)
+        for doc, score in zip(docs, scores)
     ]
     response.sort(key=lambda r: r.similarity, reverse=True)
 
